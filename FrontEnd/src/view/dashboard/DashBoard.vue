@@ -9,24 +9,26 @@
 					:width='250'
 					:stroke-width='30'
 					class='chart'
+					v-if="hasRecord"
 				>
 				</el-progress>
+				<el-empty v-else description=" "></el-empty>
 				<!-- <div ref='chart' style='width: 80%; height: 60%; margin: 0 auto;'></div> -->
 				
 				<div class='card-container'>
 					<div class='card'>
-						<div class='data-value'>{{BMI}}</div>
+						<div class='data-value'>{{hasRecord ? BMI : 'N/A'}}</div>
 						<div class='data-key'>BMI</div>
 					</div>
 
 					<div class='card'>
-						<div class='data-value'>{{weightGain}}</div>
+						<div class='data-value'>{{hasRecord ? weightGain : 'N/A'}}</div>
 						<div class='data-key'>Weight Gain</div>
 						<div class='data-unit'>kg/day</div>
 					</div>
 
 					<div class='card'>
-						<div class='data-value'>{{menstrualCycle}}</div>
+						<div class='data-value'>{{hasRecord ? menstrualCycle : 'N/A'}}</div>
 						<div class='data-key'>Menstrual Cycle</div>
 						<div class='data-unit'>days</div>
 					</div>
@@ -42,21 +44,25 @@
 				/>
 			</el-col>
 			<el-col :span='9' class='summary-container'>
-				<div>
-					<div class='summary-block'>
+				
+					<div class='summary-block' v-if="hasRecord">
 						<div class='summary-text'>Your health status is</div>
-						<div class='summary-result'>{{healthStatus}}</div>
+						<div class='summary-result' :class=healthStatus>{{healthStatus}}</div>
 						<div class='summary-text' style="marginTop: 40px">Probability of having PCOS is</div>
-						<div class='summary-result'>{{(100 - healthProbability).toFixed(1)}}%</div>
+						<div class='summary-result' :class=healthStatus>{{(100 - healthProbability).toFixed(1)}}%</div>
+					</div>
+					<div class = 'summary-block' v-else>
+						<div class='summary-text'>Looks like you haven't used our site!</div>
+						<div class='summary-text'>Click Profile button to get started!</div>
 					</div>
 			
 					<div class='summary-divider'></div>
 
 					<div class='operate-area'>
 						<div class='operate-btn'>See Detail</div>
-						<div class='operate-btn' @click='handleEdit'>Edit</div>
+						<div class='operate-btn' @click='handleEdit'>Profile</div>
 					</div>
-				</div>
+			
 			</el-col>
 	</el-row>
 </template>
@@ -64,37 +70,70 @@
 <script>
 // import * as echarts from 'echarts';
 import EditBlock from './components/EditBlock.vue'
+import { getExamineHistory } from '@/request/testApi'
 
 export default {
 	components: {
 		EditBlock,
   },
 	mounted(){
-		this.getCharts()
+		getExamineHistory({
+			email: this.$store.state.email
+		})
+		.then(res => {
+			if (!res || !res.data || res.data.length === 0) {
+				this.hasRecord = false
+			} else {
+				this.hasRecord = true
+				const data = res.data[0]
+				this.healthProbability = Number((Number(data.result) * 100).toFixed(1))
+				this.BMI = data.BMI
+				this.weightGain = data.weightGain
+				this.menstrualCycle = data.menstrualCycle
+			}
+		})
 	},
 	data() {
 		return {
-			healthStatus: 'GOOD',
-			healthProbability: 18.3,
-			BMI: 18.8,
-			weightGain: 0.2,
-			menstrualCycle: 45,
+			hasRecord: false,
+			healthProbability: 0,
+			BMI: 0,
+			weightGain: 0,
+			menstrualCycle: 0,
 			isEditing: false,
 			colors: [
-        {color: '#f56c6c', percentage: 20},
-        {color: '#e6a23c', percentage: 40},
-        {color: '#5cb87a', percentage: 60},
-        {color: '#1989fa', percentage: 80},
-        {color: '#6f7ad3', percentage: 100}
+        {color: '#F56C6C', percentage: 20},
+        {color: '#E6A23C', percentage: 40},
+        {color: '#61A67D', percentage: 60},
+        {color: '#64C23A', percentage: 80},
+        {color: '#67C23A', percentage: 100}
       ],
+			
+		}
+	},
+	computed: {
+		healthStatus() {
+			if (this.healthProbability < 25) {
+				return 'WEAK'
+			} else if (this.healthProbability < 50) {
+				return 'NORMAL'
+			} else if (this.healthProbability < 75) {
+				return 'GOOD'
+			} else {
+				return 'GREAT'
+			}
 		}
 	},
 	methods: {
 		submitEditData(obj) {
-			this.BMI = obj.BMI;
-			this.weightGain = obj.weightGain;
-			this.menstrualCycle = obj.menstrualCycle;
-			this.healthProbability = Number((100 * Math.random()).toFixed(1))
+			this.BMI = Number(Number(obj.BMI).toFixed(1));
+			this.weightGain = Number(Number(obj.weightGain).toFixed(1));
+			this.menstrualCycle = Number(Number(obj.menstrualCycle).toFixed(1));
+			// this.healthProbability = this.ret[this.ind]
+			// this.ind++
+			// this.healthProbability = Number((100 * Math.random()).toFixed(1))
+			this.healthProbability = Number((100 * Number(obj.result)).toFixed(1))
+			this.hasRecord = true
 		},
 		closeEditingBlock() {
 			this.isEditing = false;
@@ -102,11 +141,6 @@ export default {
 		handleEdit() {
 			this.isEditing = true;
 		},
-		getCharts() {
-			// const chart = this.$refs.chart
-			// const myChart = echarts.init(chart)
-			// myChart.setOption();
-		}
 	},
 }
 
@@ -176,6 +210,7 @@ export default {
 }
 .summary-block {
 	padding-top: 20px;
+	height: 50%;
 }
 
 .summary-text {
@@ -195,7 +230,7 @@ export default {
 	width: 80%;
 	height: 2px;
 	background-color: #EEEEEE;
-	margin: 80px auto 0;
+	margin: 20px auto 0;
 }
 
 .operate-btn {
@@ -210,5 +245,19 @@ export default {
 	background: rgba(50, 115, 197, 0.8);
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 	border-radius: 10px;
+}
+
+.WEAK {
+	color: #F56C6C;
+}
+.NORMAL {
+	color: #E6A23C;
+}
+.GOOD {
+	color: #61A67D;
+}
+.GREAT {
+	color: #67C23A;
+	font-size: 28px;
 }
 </style>

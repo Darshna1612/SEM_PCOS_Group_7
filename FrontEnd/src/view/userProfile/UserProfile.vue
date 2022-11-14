@@ -1,7 +1,7 @@
 <template>
   <div class='container'>
 		<div class='avatar'>
-			<div class='user-image'>JZ</div>
+			<div class='user-image'>{{ProfileName}}</div>
 		</div>
 		<div class='navigator'>
 
@@ -15,6 +15,9 @@
 				<div class='item-title' @click='clickItem(2)'>Track History</div>
 			</div>
 
+		</div>
+		<div class='logout-container'>
+			<p class='logout' @click='logout'>log out</p>
 		</div>
   </div>
 </template>
@@ -35,8 +38,16 @@ export default {
 				this.currentPage = val;
 			}, 300)
 
+		},
+		logout() {
+			this.$router.push('/')
 		}
 	},
+	computed: {
+		ProfileName: function(){
+			return this.$store.state.userName.slice(0, 2) || ''
+		}
+	}
 }
 </script>
 
@@ -95,5 +106,9 @@ export default {
 
 	.item-title {
 		padding-left: 16px;
+	}
+
+	.logout {
+		cursor: pointer;
 	}
 </style>

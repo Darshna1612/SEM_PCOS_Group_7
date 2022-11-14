@@ -4,6 +4,7 @@
     class='container'
     width="30%"
     :before-close='handleClose'
+    :close-on-click-modal=false
   >
   <div class='tabs'>
     <div class='tabs-item' :class='{"selected-tab": activeTab === "login"}' @click='clickTab("login")'>Login</div>
@@ -20,19 +21,22 @@
   </div>
 
   <div class='login-container' v-if='activeTab ==="register"'>
+    <div class='item-title'>Input Your User Name</div>
+    <el-input v-model='userName' class='item-input'></el-input>
     <div class='item-title'>Input Your Email</div>
     <el-input v-model='email' class='item-input'></el-input>
     <div class='item-title'>Input Your Password</div>
     <el-input v-model='pwd' class='item-input' show-password></el-input>
     <div class='item-title'>Confirm Your Password</div>
     <el-input v-model='pwdConfirm' class='item-input' show-password></el-input>
-    <div class='login-btn' @click='login'>Register</div>
+    <div class='login-btn' @click='register'>Register</div>
   </div>
 
   </el-dialog>
 </template>
 
 <script>
+import { createUser, loginUser } from '../../../request/userApi'
 export default {
   props: {
     showBlock: {
@@ -42,6 +46,7 @@ export default {
   },
   data() {
     return {
+      userName: '',
       activeTab: 'login',
       email: '',
       pwd: '',
@@ -50,22 +55,83 @@ export default {
   },
   methods: {
     login() {
-      this.$notify({
-        title: 'Success',
-        message: 'Log in successfully!',
-        type: 'success'
-      });
-      this.$router.push('./main')
+      const data = {
+        email: this.email,
+        password: this.pwd,
+      }
+      loginUser(data).then(res => {
+        if (res.data.status === 0) {
+          this.$notify({
+            title: 'Success',
+            message: 'Log in successfully!',
+            type: 'success'
+          });
+          console.log(res.data)
+          this.$store.commit('changeEmail', this.email)
+          this.$store.commit('changeUserName', res.data.userName || '')          
+          this.$router.push('./main')
+        } else if (res.data.status === 1) {
+          this.$notify({
+            title: 'Warning',
+            message: res.data.description || 'Something Went Wrong',
+            type: 'error'
+          })
+        }
+      })
+      return
     },
     clickTab(tab) {
       if (this.activeTab === tab) return
-      // this.activeTab = '';
+      this.email = ''
+      this.pwd = ''
+      this.pwdConfirm = ''
       setTimeout(() => {
         this.activeTab = tab;
       }, 0)
     },
     handleClose() {
       this.$emit('closeBlock')
+    },
+    register() {
+      if (this.pwd !== this.pwdConfirm) {
+        this.$notify({
+          title: 'Warning',
+          message: 'Password and Confirm Password are not same',
+          type: 'error'
+        })
+        return
+      }
+      if (this.pwd.length <= 6) {
+        this.$notify({
+          title: 'Warning',
+          message: 'Your Password is so easy!',
+          type: 'error'
+        })
+        return
+      }
+      const data = {
+        userName: this.userName,
+        email: this.email,
+        password: this.pwd,
+      }
+      createUser(data).then(res => {
+        if (res.data.status === 0) {
+          this.$notify({
+            title: 'Success',
+            message: 'Register and log in successfully!',
+            type: 'success'
+          });
+          this.$store.commit('changeEmail', this.email)
+          this.$store.commit('changeUserName', this.userName)
+          this.$router.push('./main')
+        } else if (res.data.status === 1) {
+          this.$notify({
+            title: 'Warning',
+            message: res.data.description || 'Something Went Wrong',
+            type: 'error'
+          })
+        }
+      })
     }
   }
 }

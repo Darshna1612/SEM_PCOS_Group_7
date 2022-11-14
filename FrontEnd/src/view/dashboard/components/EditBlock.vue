@@ -1,35 +1,39 @@
 <template>
   <el-dialog 
     :visible='isEditing'
-    class='container'
+    class='edit-block-container'
     width="30%"
     :before-close='handleClose'
   >
-    <div>
-      <div class='item-container'>
-        <div class='item-title'>BMI</div>
-        <el-input v-model='obj.BMI' class='item-input'></el-input>
+    <div
+      v-loading="fullscreenLoading"
+      element-loading-text="Your result will appear in seconds..."
+    >
+      <div class='edit-block-item-container'>
+        <div class='edit-block-item-title'>BMI</div>
+        <el-input v-model='obj.BMI' class='edit-block-item-input'></el-input>
       </div>
-      <div class='item-container'>
-        <div class='item-title'>Weight Gain</div>
-        <el-input v-model='obj.weightGain' class='item-input'></el-input>
+      <div class='edit-block-item-container'>
+        <div class='edit-block-item-title'>Weight Gain</div>
+        <el-input v-model='obj.weightGain' class='edit-block-item-input'></el-input>
       </div>
-      <div class='item-container'>
-        <div class='item-title'>Menstrual Cycle</div>
-        <el-input v-model='obj.menstrualCycle' class='item-input'></el-input>
+      <div class='edit-block-item-container'>
+        <div class='edit-block-item-title'>Menstrual Cycle</div>
+        <el-input v-model='obj.menstrualCycle' class='edit-block-item-input'></el-input>
       </div>
 
-      <div class='custom-divider'></div>
+      <div class='edit-block-custom-divider'></div>
 
-      <div class='button-area'>
-        <div class='btn confirm-btn' @click='handleSubmit'>Confirm</div>
-        <div class='btn cancel-btn' @click='handleClose'>Cancel</div>
+      <div class='edit-block-button-area'>
+        <div class='edit-block-btn edit-block-confirm-btn' @click='handleSubmit'>Confirm</div>
+        <div class='edit-block-btn edit-block-cancel-btn' @click='handleClose'>Cancel</div>
       </div>
     </div>
   </el-dialog>
 </template>
 
 <script>
+import { examineUser } from '../../../request/testApi'
 export default {
   props: {
     isEditing: {
@@ -68,7 +72,8 @@ export default {
         BMI: 0,
         weightGain: 0,
         menstrualCycle: 0,
-      }
+      },
+      fullscreenLoading: false
     }
   },
   methods: {
@@ -76,46 +81,57 @@ export default {
       this.$emit('closeBlock');
     },
     handleSubmit() {
-      this.$emit('submitEditData', this.obj);
-      this.$emit('closeBlock');
+      this.fullscreenLoading = true;
+      examineUser({
+        ...this.obj,
+        timeStamp: new Date().getTime(),
+        email: this.$store.state.email
+      }).then(res => {
+        console.log(res)
+        this.fullscreenLoading = false;
+        this.obj.result = res.data.examine_result;
+        this.$emit('submitEditData', this.obj);
+        this.$emit('closeBlock');
+      })
+      
     }
   }
 }
 </script>
 
-<style scoped>
-.container {
+<style>
+.edit-block-container {
   padding: 0;
 }
-.item-container {
+.edit-block-item-container {
   width: 100%;
   display: flex;
   margin-bottom: 20px;
 }
-.item-title {
+.edit-block-item-title {
   width: 30%;
   line-height: 40px;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-.item-input {
+.edit-block-item-input {
   width: 60%;
 }
 
-.custom-divider {
+.edit-block-custom-divider {
   width: 90%;
 	height: 2px;
 	background-color: #EEEEEE;
 	margin: 20px auto 10px;
 }
 
-.button-area {
+.edit-block-button-area {
   display: flex;
   justify-content: flex-end;
   margin-bottom: -10px;
 }
 
-.btn {
+.edit-block-btn {
   width: 100px;
   margin-right: 20px;
   height: 40px;
@@ -132,7 +148,11 @@ export default {
   cursor: pointer;
 }
 
-.cancel-btn {
+.edit-block-cancel-btn {
   background-color: #E6A23C;
+}
+
+.el-loading-spinner {
+  top: 30%!important;
 }
 </style>

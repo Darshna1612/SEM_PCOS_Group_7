@@ -6,6 +6,7 @@
 # It is defined by the kaggle/python Docker image: https://github.com/kaggle/docker-python
 # For example, here's several helpful packages to load
 
+from turtle import right
 import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 
@@ -249,4 +250,3 @@ sns.heatmap(cf_matrix/np.sum(cf_matrix), annot = True, annot_kws = {'size':15}, 
 
 save_to = '{}.txt'.format('pcos_model')
 rfc.booster_.save_model(save_to)
-
