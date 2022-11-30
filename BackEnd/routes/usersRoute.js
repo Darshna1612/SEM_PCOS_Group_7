@@ -91,11 +91,8 @@ router.route('/examine/:email')
       const user = users[0]
       const historys = user.historys
       const input = [req.body.BMI, req.body.weightGain, req.body.menstrualCycle, req.body.weight]
-      // ../test/venv/bin/python ../test/method.py '{"input": [[${input}]]}'
-      child_process.exec(`
-        /usr/bin/python3 ../MachineLearning/method.py '{"input": [[${input}]]}'
-      `, (error, stdout, stderr) => {
-        console.log(stdout, stderr)
+      let runMachineLearningCode = function(error, stdout, stderr) {
+        if (error) return
         const len = stdout.length
         let output = stdout.slice(2, len - 4)
         const examine_result = output.split(' ')
@@ -123,6 +120,17 @@ router.route('/examine/:email')
           }
           sendSuccess(data, res)
         })
+      }
+      // ../test/venv/bin/python ../test/method.py '{"input": [[${input}]]}'
+      child_process.exec(`
+        /usr/local/bin/python3 ../MachineLearning/method.py '{"input": [[${input}]]}'
+      `, (error, stdout, stderr) => {
+        runMachineLearningCode(error, stdout, stderr)
+      })
+      child_process.exec(`
+        /usr/bin/python3 ../MachineLearning/method.py '{"input": [[${input}]]}'
+      `, (error, stdout, stderr) => {
+        runMachineLearningCode(error, stdout, stderr)
       })
     }
   })
