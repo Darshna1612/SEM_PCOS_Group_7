@@ -214,7 +214,7 @@ export default {
 .card {
 	box-sizing: content-box;
 	height: 90px;
-	width: 180px;
+	width: 40%;
 	flex: none;
 	margin-right: 40px;
 	background: #FFFFFF;

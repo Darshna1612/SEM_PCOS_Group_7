@@ -64,6 +64,29 @@ mongod --version
 ```
 If your system has not installed MongoDB, we recommend that you follow the [official installation guide](https://www.mongodb.com/docs/manual/installation/) to install MongoDB.
 
+### ***Python***
+
+Although we use many machine learning related packages. But to start our project, the only necessary package is ***pickle***, a toolkit for reading trained models.
+
+Since it is not easy to install machine learning-related packages on different devices, we **recommend** that you use Kaggle to debug the code of the machine learning part. At the same time, you can export the generated ***.pkl file*** and name it **ml.pkl** to replace the file with the same name under the BackEnd folder.
+
+That way, you just need to make sure that your local computer has the Python and pickle packages.
+
+For Mac users, your system may have installed the Python3 environment by default. You can use this command to test whether you have python environment in your laptop. If not, follow the [official guide](https://www.python.org/downloads/) to install it.
+```
+python -v
+or 
+python3 -v
+```
+And then, you can install pickle  package.
+```
+pip install pickle
+```
+
+---
+## How to start our project?
+
+
 ### ***Start Front-End Project***
 
 In this step, you should create a new terminal first. And then follow these commands.
@@ -84,25 +107,6 @@ npm run start
 ```
 And then, you can see our back-end system starts on [http://localhost:3000/](http://localhost:3000/). And a prompt *Connected correctly to server* will be displaed in your terminal.
 
-
-### ***Python***
-
-Although we use many machine learning related packages. But to start our project, the only necessary package is ***pickle***, a toolkit for reading trained models.
-
-Since it is not easy to install machine learning-related packages on different devices, we **recommend** that you use Kaggle to debug the code of the machine learning part. At the same time, you can export the generated ***.pkl file*** and name it **ml.pkl** to replace the file with the same name under the BackEnd folder.
-
-That way, you just need to make sure that your local computer has the Python and pickle packages.
-
-For Mac users, your system may have installed the Python3 environment by default. You can use this command to test whether you have python environment in your laptop. If not, follow the [official guide](https://www.python.org/downloads/) to install it.
-```
-python -v
-or 
-python3 -v
-```
-And then, you can install pickle  package.
-```
-pip install pickle
-```
 
 ---
 
