@@ -12,8 +12,9 @@ if __name__ == '__main__':
 
     xgb_model_loaded = pickle.load(open(file_name, "rb"))
     test_data = pd.DataFrame(data)
-    test_data.columns = ['BMI', 'Weight gain(Y/N)', 'Cycle length(days)', ' Age (yrs)']
+    test_data.columns = ['BMI', 'Weight gain(Y/N)', 'Cycle length(days)', 'Weight (Kg)']
     ret = xgb_model_loaded.predict_proba(test_data)
     print(ret)
 
+# ../MachineLearning/venv/bin/python ../MachineLearning/method.py '{"input": [[24.6, 1, 5, 43]]}'
 

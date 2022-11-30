@@ -42,7 +42,7 @@ del data['Unnamed: 44']
 data['Marraige Status (Yrs)'].fillna(0, inplace=True)
 data['Fast food (Y/N)'].fillna(0, inplace=True)
 
-data = data[['PCOS (Y/N)', 'BMI','Weight gain(Y/N)','Cycle length(days)',' Age (yrs)']]
+data = data[['PCOS (Y/N)', 'BMI','Weight gain(Y/N)','Cycle length(days)', 'Weight (Kg)']]
 
 X=data.drop(["PCOS (Y/N)"],axis = 1)
 y=data["PCOS (Y/N)"]

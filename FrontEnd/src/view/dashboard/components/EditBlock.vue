@@ -14,8 +14,16 @@
         <el-input v-model='obj.BMI' class='edit-block-item-input'></el-input>
       </div>
       <div class='edit-block-item-container'>
+        <div class='edit-block-item-title'>Weight</div>
+        <el-input v-model='obj.weight' class='edit-block-item-input'></el-input>
+      </div>
+      <div class='edit-block-item-container'>
         <div class='edit-block-item-title'>Weight Gain</div>
-        <el-input v-model='obj.weightGain' class='edit-block-item-input'></el-input>
+          <el-radio-group v-model="obj.weightGain" class="edit-weight-gain">
+            <el-radio label="0">False</el-radio>
+            <el-radio label="1">True</el-radio>
+          </el-radio-group>
+
       </div>
       <div class='edit-block-item-container'>
         <div class='edit-block-item-title'>Menstrual Cycle</div>
@@ -41,16 +49,20 @@ export default {
       default: false
     },
     BMI: {
-      type: Number,
-      default: 0,
+      type: [Number, String],
+      default: '',
+    },
+    weight: {
+      type: [Number, String],
+      default: '',
     },
     weightGain: {
-      type: Number,
-      default: 0,
+      type: [Number, String, Boolean],
+      default: '',
     },
     menstrualCycle: {
-      type: Number,
-      default: 0,
+      type: [Number, String],
+      default: '',
     },
   },
   watch: {
@@ -61,6 +73,7 @@ export default {
             BMI: this.BMI,
             weightGain: this.weightGain,
             menstrualCycle: this.menstrualCycle,
+            weight: this.weight,
           }
         }
       }
@@ -70,7 +83,8 @@ export default {
     return {
       obj: {
         BMI: 0,
-        weightGain: 0,
+        weight: 0,
+        weightGain: '',
         menstrualCycle: 0,
       },
       fullscreenLoading: false
@@ -81,6 +95,14 @@ export default {
       this.$emit('closeBlock');
     },
     handleSubmit() {
+      console.log(this.obj)
+      if (isNaN(this.obj.BMI) || isNaN(this.obj.weight) || isNaN(this.obj.menstrualCycle)) {
+        this.$message({
+          type: 'error',
+          message: 'Please make sure you input valid value!'
+        })
+        return;
+      }
       this.fullscreenLoading = true;
       examineUser({
         ...this.obj,
@@ -93,11 +115,11 @@ export default {
         this.$emit('submitEditData', this.obj);
         this.$emit('closeBlock');
       })
-      
     }
   }
 }
 </script>
+
 
 <style>
 .edit-block-container {
@@ -117,12 +139,15 @@ export default {
 .edit-block-item-input {
   width: 60%;
 }
-
+.edit-weight-gain {
+  /* width: 100%; */
+  line-height: 48px;
+}
 .edit-block-custom-divider {
   width: 90%;
 	height: 2px;
 	background-color: #EEEEEE;
-	margin: 20px auto 10px;
+	margin: 20px auto 20px;
 }
 
 .edit-block-button-area {

@@ -21,13 +21,14 @@
   </div>
 
   <div class='login-container' v-if='activeTab ==="register"'>
-    <div class='item-title'>Input Your User Name</div>
+    <div class='item-title'>Input Your User Name <span style="color:red">*</span></div>
     <el-input v-model='userName' class='item-input'></el-input>
-    <div class='item-title'>Input Your Email</div>
+    <div class='item-title'>Input Your Email <span style="color:red">*</span></div>
     <el-input v-model='email' class='item-input'></el-input>
-    <div class='item-title'>Input Your Password</div>
+    <div class='item-title'>Input Your Password <span style="color:red">*</span></div>
+    <div class='item-title'><i>Must contain letters and numbers, with a length between 6 and 30</i></div>
     <el-input v-model='pwd' class='item-input' show-password></el-input>
-    <div class='item-title'>Confirm Your Password</div>
+    <div class='item-title'>Confirm Your Password <span style="color:red">*</span></div>
     <el-input v-model='pwdConfirm' class='item-input' show-password></el-input>
     <div class='login-btn' @click='register'>Register</div>
   </div>
@@ -93,6 +94,14 @@ export default {
       this.$emit('closeBlock')
     },
     register() {
+      if (this.pwd === '' || this.pwdConfirm === '' || this.email === '' || this.userName === '') {
+        this.$notify({
+          title: 'Warning',
+          message: 'Please complete all required fields!',
+          type: 'error'
+        })
+        return
+      }
       if (this.pwd !== this.pwdConfirm) {
         this.$notify({
           title: 'Warning',
@@ -101,7 +110,17 @@ export default {
         })
         return
       }
-      if (this.pwd.length <= 6) {
+      let emailRegx = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
+      if (!emailRegx.test(this.email)) {
+        this.$notify({
+          title: 'Warning',
+          message: 'Your Email is not correct!',
+          type: 'error'
+        })
+        return
+      }
+      let pwdRegex = new RegExp('(?=.*[0-9])(?=.*[a-zA-Z]).{8,30}');
+      if (!pwdRegex.test(this.pwd)) {
         this.$notify({
           title: 'Warning',
           message: 'Your Password is so easy!',

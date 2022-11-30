@@ -16,31 +16,50 @@
 				<!-- <div ref='chart' style='width: 80%; height: 60%; margin: 0 auto;'></div> -->
 				
 				<div class='card-container'>
+			
 					<div class='card'>
 						<div class='data-value'>{{hasRecord ? BMI : 'N/A'}}</div>
 						<div class='data-key'>BMI</div>
 					</div>
 
 					<div class='card'>
-						<div class='data-value'>{{hasRecord ? weightGain : 'N/A'}}</div>
+						<div class='data-value'>{{hasRecord ? weight : 'N/A'}}</div>
+						<div class='data-key'>Weight</div>
+						<div class='data-unit'>kg</div>
+					</div>
+				</div>
+
+				<div class='card-container'>
+					<div class='card'>
+						<el-tooltip class="item" effect="dark" content="Whether you have gained weight over time" placement="top">
+							<i class="el-icon-question"></i>
+						</el-tooltip>
+						<div class='data-value'>{{hasRecord ? isWeightGain : 'N/A'}}</div>
 						<div class='data-key'>Weight Gain</div>
-						<div class='data-unit'>kg/day</div>
+						<div class='data-unit'>True or False</div>
 					</div>
 
 					<div class='card'>
+						<el-tooltip class="item" effect="dark" content="The period length of your last menstrual" placement="top">
+							<i class="el-icon-question"></i>
+						</el-tooltip>
 						<div class='data-value'>{{hasRecord ? menstrualCycle : 'N/A'}}</div>
-						<div class='data-key'>Menstrual Cycle</div>
+						<div class='data-key'>Menstrual Length</div>
 						<div class='data-unit'>days</div>
 					</div>
-
-				</div>
+				</div> 
 				<EditBlock 
 					:isEditing='isEditing' 
 					:BMI='BMI'
+					:weight='weight'
 					:weightGain='weightGain'
 					:menstrualCycle='menstrualCycle'
 					@submitEditData='submitEditData'
 					@closeBlock='closeEditingBlock'
+				/>
+				<InstructionBlock
+					:instruction='instruction'
+					@closeInstruction='instruction=false'
 				/>
 			</el-col>
 			<el-col :span='9' class='summary-container'>
@@ -59,7 +78,7 @@
 					<div class='summary-divider'></div>
 
 					<div class='operate-area'>
-						<div class='operate-btn'>See Detail</div>
+						<div class='operate-btn' @click='openInstruction'>Instruction</div>
 						<div class='operate-btn' @click='handleEdit'>Profile</div>
 					</div>
 			
@@ -70,11 +89,13 @@
 <script>
 // import * as echarts from 'echarts';
 import EditBlock from './components/EditBlock.vue'
+import InstructionBlock from './components/InstructionBlock.vue'
 import { getExamineHistory } from '@/request/testApi'
 
 export default {
 	components: {
 		EditBlock,
+		InstructionBlock
   },
 	mounted(){
 		getExamineHistory({
@@ -88,8 +109,10 @@ export default {
 				const data = res.data[0]
 				this.healthProbability = Number((Number(data.result) * 100).toFixed(1))
 				this.BMI = data.BMI
-				this.weightGain = data.weightGain
+				this.weight = data.weight
+				this.weightGain = data.weightGain + ''
 				this.menstrualCycle = data.menstrualCycle
+				console.log('weightGain', this.weightGain)
 			}
 		})
 	},
@@ -97,10 +120,12 @@ export default {
 		return {
 			hasRecord: false,
 			healthProbability: 0,
-			BMI: 0,
-			weightGain: 0,
-			menstrualCycle: 0,
+			BMI: '',
+			weight: '',
+			weightGain: '',
+			menstrualCycle: '',
 			isEditing: false,
+			instruction: false,
 			colors: [
         {color: '#F56C6C', percentage: 20},
         {color: '#E6A23C', percentage: 40},
@@ -122,13 +147,18 @@ export default {
 			} else {
 				return 'GREAT'
 			}
+		},
+		isWeightGain() {
+			if (this.weightGain === '') return 'N/A';
+			return this.weightGain === '1' ? 'True' : 'False'
 		}
 	},
 	methods: {
 		submitEditData(obj) {
 			this.BMI = Number(Number(obj.BMI).toFixed(1));
-			this.weightGain = Number(Number(obj.weightGain).toFixed(1));
+			this.weightGain = obj.weightGain;
 			this.menstrualCycle = Number(Number(obj.menstrualCycle).toFixed(1));
+			this.weight = Number(Number(obj.weight).toFixed(1));
 			// this.healthProbability = this.ret[this.ind]
 			// this.ind++
 			// this.healthProbability = Number((100 * Math.random()).toFixed(1))
@@ -141,6 +171,9 @@ export default {
 		handleEdit() {
 			this.isEditing = true;
 		},
+		openInstruction() {
+			this.instruction = true
+		}
 	},
 }
 
@@ -163,31 +196,43 @@ export default {
 	height: 100%;
 	border-right: 1px #EEE solid;
 	padding: 0 20px;
+	text-align: center;
 }
 
 .chart {
 	/* width: 80%; */
+	margin: 0 auto;
 }
 
 .card-container {
 	width: 100%;
 	display: flex;
-	margin-top: 20px;
+	margin: 20px 0 0 10px;
 	justify-content: space-between;
-	/* overflow: hidden; */
+	/* overflow: auto; */
 }
 .card {
 	box-sizing: content-box;
-	height: 140px;
-	width: 120px;
-	/* margin-right: 40px; */
+	height: 90px;
+	width: 180px;
+	flex: none;
+	margin-right: 40px;
 	background: #FFFFFF;
 	border: 1px solid #EEEEEE;
 	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+	/* display: flex;
+	justify-content: space-between;
+	flex-direction: column; */
+	position: relative;
+}
+.el-icon-question {
+	position: absolute;
+	right: 10px;
+	top: 10px;
 }
 
 .data-value {
-	margin: 20px auto;
+	margin: 10px auto 0;
 	font-size: 24px;
 	font-weight: bold;
 	color: rgba(97, 166, 125, 1);

@@ -90,8 +90,7 @@ router.route('/examine/:email')
     } else {
       const user = users[0]
       const historys = user.historys
-      console.log("this is user", user)
-      const input = [req.body.BMI, req.body.weightGain, req.body.menstrualCycle, 0.3]
+      const input = [req.body.BMI, req.body.weightGain, req.body.menstrualCycle, req.body.weight]
       child_process.exec(`
         ../MachineLearning/venv/bin/python ../MachineLearning/method.py '{"input": [[${input}]]}'
       `, (error, stdout, stderr) => {
@@ -100,14 +99,14 @@ router.route('/examine/:email')
         let output = stdout.slice(2, len - 4)
         const examine_result = output.split(' ')
         console.log(examine_result)
-        
-        let randomMock = Math.random()
+        let val = Number(examine_result[0])
+        val = Math.max(val - 0.45, 0.001) * 10 + ''
+        // let randomMock = Math.random()
         historys.unshift({
           ...req.body,
-          // result: examine_result[0],
-          result: randomMock,
+          result: val,
+          // result: randomMock,
         })
-        console.log(historys)
         User.updateOne(
           { email: req.params.email },
           {
@@ -117,8 +116,8 @@ router.route('/examine/:email')
           }
         ).then(_ => {
           const data = {
-            // examine_result: examine_result[0],
-            examine_result: randomMock,
+            examine_result: val,
+            // examine_result: randomMock,
             status: MSG_CODE.SUCCESS,
           }
           sendSuccess(data, res)

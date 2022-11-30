@@ -24,12 +24,12 @@
 						<div class='summary-divider'></div>
 					</div> 
 					<div class='info-item'>
-						<div class='info-key'>Weight Gain:</div> 
-						<div class='info-value'>{{curData.weightGain}}</div>
+						<div class='info-key'>Weight (Kg):</div> 
+						<div class='info-value'>{{curData.weight}}</div>
 						<div class='summary-divider'></div>
 					</div> 
 					<div class='info-item'>
-						<div class='info-key'>Cycle:</div> 
+						<div class='info-key'>Cycle (Days):</div> 
 						<div class='info-value'>{{curData.cycle}}</div>
 						<el-divider></el-divider>
 					</div> 
@@ -58,7 +58,7 @@ export default {
 				date: getTime(this.historyData[n - 1].timeStamp),
 				result: (Number(this.historyData[n - 1].result) * 100).toFixed(1) + ' %',
 				BMI: this.historyData[n - 1].BMI,
-				weightGain: this.historyData[n - 1].weightGain,
+				weight: this.historyData[n - 1].weight,
 				cycle: this.historyData[n - 1].menstrualCycle,
 			}
 			this.getCharts()
@@ -73,7 +73,7 @@ export default {
 				date: '',
 				result: '',
 				BMI: '',
-				weightGain: '',
+				weight: '',
 				cycle: '',
 			}
 		}
@@ -137,7 +137,7 @@ export default {
 					date: getTime(this.historyData[index].timeStamp),
 					result: (Number(this.historyData[index].result) * 100).toFixed(1) + ' %',
 					BMI: this.historyData[index].BMI,
-					weightGain: this.historyData[index].weightGain,
+					weight: this.historyData[index].weight,
 					cycle: this.historyData[index].menstrualCycle,
 				}
 			})
