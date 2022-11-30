@@ -91,8 +91,9 @@ router.route('/examine/:email')
       const user = users[0]
       const historys = user.historys
       const input = [req.body.BMI, req.body.weightGain, req.body.menstrualCycle, req.body.weight]
+      // ../test/venv/bin/python ../test/method.py '{"input": [[${input}]]}'
       child_process.exec(`
-        ../MachineLearning/venv/bin/python ../MachineLearning/method.py '{"input": [[${input}]]}'
+        /usr/bin/python3 ../test/method.py '{"input": [[${input}]]}'
       `, (error, stdout, stderr) => {
         console.log(stdout, stderr)
         const len = stdout.length

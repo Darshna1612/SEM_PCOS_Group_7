@@ -66,21 +66,17 @@ If your system has not installed MongoDB, we recommend that you follow the [offi
 
 ### ***Python***
 
-Although we use many machine learning related packages. But to start our project, the only necessary package is ***pickle***, a toolkit for reading trained models.
-
-Since it is not easy to install machine learning-related packages on different devices, we **recommend** that you use Kaggle to debug the code of the machine learning part. At the same time, you can export the generated ***.pkl file*** and name it **ml.pkl** to replace the file with the same name under the BackEnd folder.
-
-That way, you just need to make sure that your local computer has the Python and pickle packages.
+For our project, we hope you have `Python3` environment.
 
 For Mac users, your system may have installed the Python3 environment by default. You can use this command to test whether you have python environment in your laptop. If not, follow the [official guide](https://www.python.org/downloads/) to install it.
 ```
-python -v
-or 
 python3 -v
 ```
-And then, you can install pickle  package.
+
+Once you make sure you have `Python3` environment in your laptop, you can follow these commands.
 ```
-pip install pickle
+cd MachineLearning
+pip3 install -r requirements.txt -v 
 ```
 
 ---
